@@ -29,7 +29,6 @@ for i in ids:
 #james = PlayerProfileV2(nba_players.id[nba_players.full_name == 'LeBron James']).get_data_frames()[1][0]
 #curry = PlayerProfileV2(nba_players.id[nba_players.full_name == 'Stephen Curry']).get_data_frames()[1][0]
 #%%
-# excel 파일만들기
 with pd.ExcelWriter('nba_player_career.xlsx') as w:
     players_career.to_excel(w,sheet_name = 'players_career',index = False)
 with pd.ExcelWriter('nba_teams.xlsx') as w:
@@ -48,6 +47,7 @@ curry_post_season = c_curry[2]
 curry_total_P = c_curry[3]
 curry_cnt_allstar = len(c_curry[4])
 #======================================
+#magic 커리어
 magic_id = players.find_players_by_full_name("Magic Johnson")[0]['id']
 c_magic = PlayerCareerStats(player_id=magic_id).get_data_frames()
 magic_regular_season = c_magic[0]
@@ -65,10 +65,6 @@ get data frame
 4-시즌별 올스타 기록
 5-통산 올스타 기록
 '''
-#%%
-c_m_compare = PlayerCompare(magic_id, curry_id)
-#%%
-cpr_df = c_m_compare.get_data_frames()
 #%%
 with pd.ExcelWriter('curry_ReagularSeason.xlsx') as w:
     curry_regular_season.to_excel(w,sheet_name = 'curry_reason',index = False)
@@ -88,10 +84,7 @@ with pd.ExcelWriter('magic_PostSeason.xlsx') as w:
 with pd.ExcelWriter('magic_p_total.xlsx') as w:
     magic_total_P.to_excel(w,sheet_name = 'magic_p_total',index = False)
 #%%
-from nba_api.stats.endpoints import TeamYearByYearStats
-
-goldenStates = TeamYearByYearStats("1610612744").get_data_frames()[0].loc[goldenStates.YEAR == '2022-23']
-#%%
+ #22-23시즌 TEAM 스텟
 from nba_api.stats.endpoints import TeamYearByYearStats
 
 teams_stats = pd.DataFrame()
@@ -103,11 +96,14 @@ for team_id in nba_teams.id:
 with pd.ExcelWriter('2022-2023.xlsx') as w:
     teams_stats.to_excel(w,sheet_name = '2022-2023',index = False)    
     
-    
-
-
-
-
-
-
+#%%
+#22-23시즌 PLAYER 스텟
+last_season_stats = pd.DataFrame() 
+for ID in  nba_players.id:
+    player_stat = PlayerCareerStats(player_id=ID).get_data_frames()[0]
+    stat = player_stat.loc[player_stat["SEASON_ID"]=="2022-23"]
+    last_season_stats = pd.concat([last_season_stats,stat])
+#%%
+with pd.ExcelWriter('22-23_player.xlsx') as w:
+    last_season_stats.to_excel(w,index = False)   
 
